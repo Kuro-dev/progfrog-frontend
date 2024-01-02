@@ -1,0 +1,214 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080/api/progfrog
+  description: Generated server url
+paths:
+  /game/execute:
+    post:
+      tags:
+      - gamecontroller
+      operationId: executeScript
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ScriptResult'
+  /game/compileScript:
+    post:
+      tags:
+      - gamecontroller
+      operationId: compileScript
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompileScriptRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CompileMapResponse'
+  /game/compileMap:
+    post:
+      tags:
+      - gamecontroller
+      operationId: compileMap
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompileMapRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CompileMapResponse'
+  /editor/draw:
+    post:
+      tags:
+      - map-editor-controller
+      operationId: draw
+      parameters:
+      - name: editorID
+        in: query
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/MapEditorDrawRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/MapEditorResponse'
+  /editor/create:
+    get:
+      tags:
+      - map-editor-controller
+      operationId: createEmptyMap
+      parameters:
+      - name: initialWidth
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: initialHeight
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/MapEditorResponse'
+components:
+  schemas:
+    MethodCall:
+      type: object
+      properties:
+        name:
+          type: string
+        result:
+          type: string
+    ScriptResult:
+      required:
+      - callStack
+      type: object
+      properties:
+        callStack:
+          type: array
+          items:
+            $ref: '#/components/schemas/MethodCall'
+        exception:
+          type: string
+    CompileScriptRequest:
+      required:
+      - mapID
+      - script
+      type: object
+      properties:
+        mapID:
+          type: string
+        script:
+          type: string
+    CompileMapResponse:
+      required:
+      - mapID
+      type: object
+      properties:
+        mapID:
+          type: string
+    CompileMapRequest:
+      required:
+      - map
+      type: object
+      properties:
+        frogData:
+          $ref: '#/components/schemas/FrogDataDTO'
+        mapId:
+          type: string
+        map:
+          type: string
+        rowDelimiter:
+          type: string
+    Coordinate:
+      type: object
+      properties:
+        "y":
+          type: integer
+          format: int32
+        x:
+          type: integer
+          format: int32
+    FrogDataDTO:
+      required:
+      - initialDirection
+      type: object
+      properties:
+        frogPosition:
+          $ref: '#/components/schemas/Coordinate'
+        initialDirection:
+          type: string
+          enum:
+          - NORTH
+          - SOUTH
+          - WEST
+          - EAST
+    MapEditorDrawRequest:
+      required:
+      - pos
+      - type
+      type: object
+      properties:
+        pos:
+          $ref: '#/components/schemas/Coordinate'
+        type:
+          $ref: '#/components/schemas/TileType'
+    TileType:
+      type: string
+      enum:
+      - WALL
+      - FLOOR
+      - VOID
+    MapEditorResponse:
+      required:
+      - map
+      - mapID
+      type: object
+      properties:
+        mapID:
+          type: string
+        map:
+          type: string
