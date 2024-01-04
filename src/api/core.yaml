@@ -166,10 +166,10 @@ components:
     Coordinate:
       type: object
       properties:
-        "y":
+        x:
           type: integer
           format: int32
-        x:
+        "y":
           type: integer
           format: int32
     FrogDataDTO:
@@ -199,9 +199,13 @@ components:
     TileType:
       type: string
       enum:
-      - WALL
-      - FLOOR
-      - VOID
+      - X
+      - "0"
+      - '#'
+      x-enum-varnames:
+        - WALL
+        - FLOOR
+        - VOID
     MapEditorResponse:
       required:
       - map

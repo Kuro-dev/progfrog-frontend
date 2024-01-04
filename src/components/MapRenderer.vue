@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import {computed, onMounted, ref, toRef, watch} from 'vue';
-import {computedEager} from "@vueuse/core";
-import {useGlobalStore} from "@/stores/GlobalStore";
+import {computed, onMounted, ref, watch} from 'vue';
+import {TileType} from "@/api/generated";
 
 interface MapDrawerProps {
   mapString: string;
@@ -17,16 +16,12 @@ const props = withDefaults(defineProps<MapDrawerProps>(), {
 });
 
 
-const store = useGlobalStore()
-const tileSize = toRef(store, "computedTileSize")
 const canvas = ref<HTMLCanvasElement | null>(null);
 const bufferCanvas = ref<HTMLCanvasElement | null>(null);
-const map = computedEager(() => props.mapString.trim())
-const width = computed(() => Math.max(...map.value.split('\n').map(val => val.length)) * tileSize.value);
-const height = computed(() => map.value.split('\n').length * tileSize.value);
+const width = computed(() => window.innerWidth * .5);
+const height = computed(() => window.innerHeight);
 
 watch(() => props, () => drawMap(), {deep: true})
-watch(() => tileSize, () => drawMap())
 
 function drawBufferedImage() {
   const visibleCtx = canvas.value?.getContext('2d');
@@ -37,31 +32,36 @@ function drawBufferedImage() {
 
 function getTexture(char: string) {
   switch (char) {
-    case "X" :
+    case TileType.WALL :
       return props.wallTexture;
-    case "0" :
+    case TileType.FLOOR :
       return props.floorTexture
-    case "#" :
+    case TileType.VOID :
       return props.voidTexture
   }
   throw new Error("Unknown character: " + char)
 }
 
+watch(width, () => drawMap())
+watch(height, () => drawMap())
+
 function drawMap() {
   if (!bufferCanvas.value || !props.mapString) return;
-
+  const map = props.mapString.trim()
+  const tileSizeX: number = width.value / Math.max(...map.split('\n').map(val => val.length));
+  const tileSizeY: number = height.value / map.split('\n').length;
   const ctx: CanvasRenderingContext2D | null = bufferCanvas.value.getContext('2d');
   if (!ctx) return;
 
   const mapLines = props.mapString.trim().split('\n');
   const calls: Promise<void>[] = []
   mapLines.forEach((column, y) => {
-    const yPos = y * tileSize.value;
+    const yPos = y * tileSizeY;
     Array.from(column).forEach((char, x) => {
       const img = new Image();
       calls.push(new Promise((resolve, reject) => {
         img.onload = () => {
-          ctx.drawImage(img, x * tileSize.value, yPos, tileSize.value, tileSize.value);
+          ctx.drawImage(img, x * tileSizeX, yPos, tileSizeX, tileSizeY);
           resolve()
         }
         img.onerror = reject;

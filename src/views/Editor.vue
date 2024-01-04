@@ -4,12 +4,13 @@ import {useEditorApi} from "@/composables/EditorHelper";
 import MapRenderer from "@/components/MapRenderer.vue";
 import {ref} from "vue";
 import {useDebounceFn} from "@vueuse/core";
+import AdvancedEditor from "@/components/AdvancedEditor.vue";
+import * as buffer from "buffer";
 
 const editor = useEditorApi()
 
 const {loading, mapId, mapData} = editor
 
-const bufferedMapData = ref("");
 
 function createMap() {
   editor.createNew(newMapX.value || 10, newMapY.value || 10).then(map => bufferedMapData.value = map)
@@ -26,10 +27,7 @@ function dimensionValid(dim?: number): true | string {
   return !!dim && dim > 0 || "Please enter a positive number above 0";
 }
 
-const fn = useDebounceFn(() => {
-  const data: string = mapData.value
 
-}, 300)
 
 function tryUpdateMap() {
 
@@ -59,9 +57,7 @@ function tryUpdateMap() {
           </div>
           <div v-if="mapId" class="mt-3">
             <v-btn color="secondary" @click="advancedMode = !advancedMode">Toggle Advanced mode</v-btn>
-            <v-textarea v-model="bufferedMapData" :auto-grow="true" :disabled="!advancedMode" class="text-mono"
-                        label="Mapdata"
-                        @update:model-value="tryUpdateMap"/>
+            <AdvancedEditor v-model="mapData" :disabled="!advancedMode"></AdvancedEditor>
           </div>
         </v-col>
         <v-col>

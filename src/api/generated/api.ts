@@ -97,13 +97,13 @@ export interface Coordinate {
      * @type {number}
      * @memberof Coordinate
      */
-    'y'?: number;
+    'x'?: number;
     /**
      * 
      * @type {number}
      * @memberof Coordinate
      */
-    'x'?: number;
+    'y'?: number;
 }
 /**
  * 
@@ -219,9 +219,9 @@ export interface ScriptResult {
  */
 
 export const TileType = {
-    Wall: 'WALL',
-    Floor: 'FLOOR',
-    Void: 'VOID'
+    WALL: 'X',
+    FLOOR: '0',
+    VOID: '#'
 } as const;
 
 export type TileType = typeof TileType[keyof typeof TileType];
