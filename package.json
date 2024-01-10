@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "api:generate": "curl -o ./src/api/core.yaml http://localhost:8080/api/progfrog/v3/api-docs.yaml",
     "api:compile": "npx openapi-generator-cli generate -i ./src/api/core.yaml -g typescript-axios -o ./src/api/generated",
     "api:complete": "npm run api:generate && npm run api:compile",

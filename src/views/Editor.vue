@@ -2,21 +2,23 @@
 
 import {useEditorApi} from "@/composables/EditorHelper";
 import MapRenderer from "@/components/MapRenderer.vue";
-import {ref} from "vue";
-import {useDebounceFn} from "@vueuse/core";
-import AdvancedEditor from "@/components/AdvancedEditor.vue";
-import * as buffer from "buffer";
+import {reactive, ref, toValue} from "vue";
+import MapEditor from "@/components/editor/MapEditor.vue";
+import {useEditorStore} from "@/stores/EditorStore";
+import {type Coordinate, TileType} from "@/api/generated";
+import {useAssetStore} from "@/stores/AssetStore";
+import MapSelectionMenuItem from "@/components/contextmenu/MapSelectionMenuItem.vue";
+import FrogSelectionmenuItem from "@/components/contextmenu/FrogSelectionmenuItem.vue";
 
 const editor = useEditorApi()
 
 const {loading, mapId, mapData} = editor
-
+const assetStore = useAssetStore();
 
 function createMap() {
-  editor.createNew(newMapX.value || 10, newMapY.value || 10).then(map => bufferedMapData.value = map)
+  editor.createNew(newMapX.value || 10, newMapY.value || 10)
 }
 
-const advancedMode = ref(false)
 
 const newMapX = ref(10)
 const newMapY = ref(10)
@@ -28,17 +30,40 @@ function dimensionValid(dim?: number): true | string {
 }
 
 
+const store = useEditorStore()
+const api = useEditorApi()
 
-function tryUpdateMap() {
-
+function tryEditorInteraction() {
+  const listener = toValue(store.onEditorClick)
+  if (listener) {
+    listener()
+  } else {
+    if (!store.selectedType || store.selectedType === TileType.None) {
+      return;
+    }
+    if (store.selectedTile) {
+      api.draw(store.selectedTile, store.selectedType)
+    }
+  }
 }
+
+const showContextMenu = ref(false);
+const menuPosition = reactive<Coordinate>({x: 0, y: 0})
+
+function showCustomContextMenu(event: MouseEvent) {
+  menuPosition.x = event.x
+  menuPosition.y = event.y
+  showContextMenu.value = true;
+}
+
+
 </script>
 
 <template>
   <v-container>
     <v-responsive>
       <v-row>
-        <v-col>
+        <v-col class="mt-10">
           <div>
             <p v-if="mapId">MapID: {{ mapId }}</p>
             <v-form v-model="mapDimensionValid">
@@ -56,14 +81,28 @@ function tryUpdateMap() {
             <v-btn :disabled="!mapDimensionValid" color="primary" @click="createMap">Create new map</v-btn>
           </div>
           <div v-if="mapId" class="mt-3">
-            <v-btn color="secondary" @click="advancedMode = !advancedMode">Toggle Advanced mode</v-btn>
-            <AdvancedEditor v-model="mapData" :disabled="!advancedMode"></AdvancedEditor>
+
+            <MapEditor></MapEditor>
           </div>
         </v-col>
         <v-col>
-          <MapRenderer :map-string="mapData"/>
+          <MapRenderer v-if="mapData" v-model:selected-tile="store.selectedTile" :frog="store.frog"
+                       :map-string="mapData" show-debug-info
+                       show-hover-tile @click="tryEditorInteraction" @contextmenu="showCustomContextMenu"/>
         </v-col>
       </v-row>
+      <v-menu v-model="showContextMenu"
+              :style="{ top: `${menuPosition.y}px`, left: `${menuPosition.x}px` }"
+              location-strategy="connected"
+              target="cursor"
+              @contextmenu.prevent>
+        <v-list @contextmenu.prevent>
+          <MapSelectionMenuItem :type="TileType.Floor"/>
+          <MapSelectionMenuItem :type="TileType.Wall"/>
+          <MapSelectionMenuItem :type="TileType.Void"/>
+          <FrogSelectionmenuItem/>
+        </v-list>
+      </v-menu>
     </v-responsive>
 
   </v-container>

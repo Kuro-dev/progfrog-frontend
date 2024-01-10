@@ -9,7 +9,7 @@ paths:
   /game/execute:
     post:
       tags:
-      - gamecontroller
+      - game-controller
       operationId: executeScript
       requestBody:
         content:
@@ -27,7 +27,7 @@ paths:
   /game/compileScript:
     post:
       tags:
-      - gamecontroller
+      - game-controller
       operationId: compileScript
       requestBody:
         content:
@@ -45,7 +45,7 @@ paths:
   /game/compileMap:
     post:
       tags:
-      - gamecontroller
+      - game-controller
       operationId: compileMap
       requestBody:
         content:
@@ -60,6 +60,77 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/CompileMapResponse'
+  /editor/setMap:
+    post:
+      tags:
+      - map-editor-controller
+      operationId: setMap
+      parameters:
+      - name: editorID
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: map
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/MapEditorResponse'
+  /editor/setFrog:
+    post:
+      tags:
+      - map-editor-controller
+      operationId: setFrog
+      parameters:
+      - name: editorID
+        in: query
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FrogDTO'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/MapEditorResponse'
+  /editor/setFood:
+    post:
+      tags:
+      - map-editor-controller
+      operationId: setFood
+      parameters:
+      - name: editorID
+        in: query
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MapEditorFoodRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/MapEditorResponse'
   /editor/draw:
     post:
       tags:
@@ -79,6 +150,24 @@ paths:
               items:
                 $ref: '#/components/schemas/MapEditorDrawRequest'
         required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/MapEditorResponse'
+  /editor/load:
+    get:
+      tags:
+      - map-editor-controller
+      operationId: loadMap
+      parameters:
+      - name: editorID
+        in: query
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -155,8 +244,6 @@ components:
       - map
       type: object
       properties:
-        frogData:
-          $ref: '#/components/schemas/FrogDataDTO'
         mapId:
           type: string
         map:
@@ -169,23 +256,54 @@ components:
         x:
           type: integer
           format: int32
+          writeOnly: true
         "y":
           type: integer
           format: int32
-    FrogDataDTO:
+          writeOnly: true
+    Direction:
+      type: string
+      enum:
+      - NORTH
+      - SOUTH
+      - WEST
+      - EAST
+    FrogDTO:
       required:
-      - initialDirection
+      - direction
+      - position
       type: object
       properties:
-        frogPosition:
+        position:
           $ref: '#/components/schemas/Coordinate'
-        initialDirection:
+        direction:
+          $ref: '#/components/schemas/Direction'
+    MapEditorResponse:
+      required:
+      - foodItems
+      - map
+      - mapID
+      type: object
+      properties:
+        mapID:
           type: string
-          enum:
-          - NORTH
-          - SOUTH
-          - WEST
-          - EAST
+        map:
+          type: string
+        frog:
+          $ref: '#/components/schemas/FrogDTO'
+        foodItems:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+    MapEditorFoodRequest:
+      type: object
+      properties:
+        position:
+          $ref: '#/components/schemas/Coordinate'
+        foodCount:
+          type: integer
+          format: int32
     MapEditorDrawRequest:
       required:
       - pos
@@ -199,20 +317,7 @@ components:
     TileType:
       type: string
       enum:
-      - X
-      - "0"
-      - '#'
-      x-enum-varnames:
-        - WALL
-        - FLOOR
-        - VOID
-    MapEditorResponse:
-      required:
-      - map
-      - mapID
-      type: object
-      properties:
-        mapID:
-          type: string
-        map:
-          type: string
+      - WALL
+      - FLOOR
+      - VOID
+      - NONE

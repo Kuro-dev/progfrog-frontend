@@ -31,12 +31,6 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 export interface CompileMapRequest {
     /**
      * 
-     * @type {FrogDataDTO}
-     * @memberof CompileMapRequest
-     */
-    'frogData'?: FrogDataDTO;
-    /**
-     * 
      * @type {string}
      * @memberof CompileMapRequest
      */
@@ -108,31 +102,39 @@ export interface Coordinate {
 /**
  * 
  * @export
- * @interface FrogDataDTO
+ * @enum {string}
  */
-export interface FrogDataDTO {
-    /**
-     * 
-     * @type {Coordinate}
-     * @memberof FrogDataDTO
-     */
-    'frogPosition'?: Coordinate;
-    /**
-     * 
-     * @type {string}
-     * @memberof FrogDataDTO
-     */
-    'initialDirection': FrogDataDTOInitialDirectionEnum;
-}
 
-export const FrogDataDTOInitialDirectionEnum = {
+export const Direction = {
     North: 'NORTH',
     South: 'SOUTH',
     West: 'WEST',
     East: 'EAST'
 } as const;
 
-export type FrogDataDTOInitialDirectionEnum = typeof FrogDataDTOInitialDirectionEnum[keyof typeof FrogDataDTOInitialDirectionEnum];
+export type Direction = typeof Direction[keyof typeof Direction];
+
+
+/**
+ * 
+ * @export
+ * @interface FrogDTO
+ */
+export interface FrogDTO {
+    /**
+     * 
+     * @type {Coordinate}
+     * @memberof FrogDTO
+     */
+    'position': Coordinate;
+    /**
+     * 
+     * @type {Direction}
+     * @memberof FrogDTO
+     */
+    'direction': Direction;
+}
+
 
 /**
  * 
@@ -158,6 +160,25 @@ export interface MapEditorDrawRequest {
 /**
  * 
  * @export
+ * @interface MapEditorFoodRequest
+ */
+export interface MapEditorFoodRequest {
+    /**
+     * 
+     * @type {Coordinate}
+     * @memberof MapEditorFoodRequest
+     */
+    'position'?: Coordinate;
+    /**
+     * 
+     * @type {number}
+     * @memberof MapEditorFoodRequest
+     */
+    'foodCount'?: number;
+}
+/**
+ * 
+ * @export
  * @interface MapEditorResponse
  */
 export interface MapEditorResponse {
@@ -173,6 +194,18 @@ export interface MapEditorResponse {
      * @memberof MapEditorResponse
      */
     'map': string;
+    /**
+     * 
+     * @type {FrogDTO}
+     * @memberof MapEditorResponse
+     */
+    'frog'?: FrogDTO;
+    /**
+     * 
+     * @type {{ [key: string]: number; }}
+     * @memberof MapEditorResponse
+     */
+    'foodItems': { [key: string]: number; };
 }
 /**
  * 
@@ -219,9 +252,10 @@ export interface ScriptResult {
  */
 
 export const TileType = {
-    WALL: 'X',
-    FLOOR: '0',
-    VOID: '#'
+    Wall: 'WALL',
+    Floor: 'FLOOR',
+    Void: 'VOID',
+    None: 'NONE'
 } as const;
 
 export type TileType = typeof TileType[keyof typeof TileType];
@@ -229,10 +263,10 @@ export type TileType = typeof TileType[keyof typeof TileType];
 
 
 /**
- * GamecontrollerApi - axios parameter creator
+ * GameControllerApi - axios parameter creator
  * @export
  */
-export const GamecontrollerApiAxiosParamCreator = function (configuration?: Configuration) {
+export const GameControllerApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
          * 
@@ -343,11 +377,11 @@ export const GamecontrollerApiAxiosParamCreator = function (configuration?: Conf
 };
 
 /**
- * GamecontrollerApi - functional programming interface
+ * GameControllerApi - functional programming interface
  * @export
  */
-export const GamecontrollerApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = GamecontrollerApiAxiosParamCreator(configuration)
+export const GameControllerApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = GameControllerApiAxiosParamCreator(configuration)
     return {
         /**
          * 
@@ -358,7 +392,7 @@ export const GamecontrollerApiFp = function(configuration?: Configuration) {
         async compileMap(compileMapRequest: CompileMapRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CompileMapResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.compileMap(compileMapRequest, options);
             const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['GamecontrollerApi.compileMap']?.[index]?.url;
+            const operationBasePath = operationServerMap['GameControllerApi.compileMap']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
         /**
@@ -370,7 +404,7 @@ export const GamecontrollerApiFp = function(configuration?: Configuration) {
         async compileScript(compileScriptRequest: CompileScriptRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CompileMapResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.compileScript(compileScriptRequest, options);
             const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['GamecontrollerApi.compileScript']?.[index]?.url;
+            const operationBasePath = operationServerMap['GameControllerApi.compileScript']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
         /**
@@ -382,18 +416,18 @@ export const GamecontrollerApiFp = function(configuration?: Configuration) {
         async executeScript(body: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScriptResult>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.executeScript(body, options);
             const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['GamecontrollerApi.executeScript']?.[index]?.url;
+            const operationBasePath = operationServerMap['GameControllerApi.executeScript']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
     }
 };
 
 /**
- * GamecontrollerApi - factory interface
+ * GameControllerApi - factory interface
  * @export
  */
-export const GamecontrollerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = GamecontrollerApiFp(configuration)
+export const GameControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = GameControllerApiFp(configuration)
     return {
         /**
          * 
@@ -426,21 +460,21 @@ export const GamecontrollerApiFactory = function (configuration?: Configuration,
 };
 
 /**
- * GamecontrollerApi - object-oriented interface
+ * GameControllerApi - object-oriented interface
  * @export
- * @class GamecontrollerApi
+ * @class GameControllerApi
  * @extends {BaseAPI}
  */
-export class GamecontrollerApi extends BaseAPI {
+export class GameControllerApi extends BaseAPI {
     /**
      * 
      * @param {CompileMapRequest} compileMapRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof GamecontrollerApi
+     * @memberof GameControllerApi
      */
     public compileMap(compileMapRequest: CompileMapRequest, options?: RawAxiosRequestConfig) {
-        return GamecontrollerApiFp(this.configuration).compileMap(compileMapRequest, options).then((request) => request(this.axios, this.basePath));
+        return GameControllerApiFp(this.configuration).compileMap(compileMapRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -448,10 +482,10 @@ export class GamecontrollerApi extends BaseAPI {
      * @param {CompileScriptRequest} compileScriptRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof GamecontrollerApi
+     * @memberof GameControllerApi
      */
     public compileScript(compileScriptRequest: CompileScriptRequest, options?: RawAxiosRequestConfig) {
-        return GamecontrollerApiFp(this.configuration).compileScript(compileScriptRequest, options).then((request) => request(this.axios, this.basePath));
+        return GameControllerApiFp(this.configuration).compileScript(compileScriptRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -459,10 +493,10 @@ export class GamecontrollerApi extends BaseAPI {
      * @param {string} body 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof GamecontrollerApi
+     * @memberof GameControllerApi
      */
     public executeScript(body: string, options?: RawAxiosRequestConfig) {
-        return GamecontrollerApiFp(this.configuration).executeScript(body, options).then((request) => request(this.axios, this.basePath));
+        return GameControllerApiFp(this.configuration).executeScript(body, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -555,6 +589,169 @@ export const MapEditorControllerApiAxiosParamCreator = function (configuration?:
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @param {string} editorID 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        loadMap: async (editorID: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'editorID' is not null or undefined
+            assertParamExists('loadMap', 'editorID', editorID)
+            const localVarPath = `/editor/load`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (editorID !== undefined) {
+                localVarQueryParameter['editorID'] = editorID;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} editorID 
+         * @param {MapEditorFoodRequest} mapEditorFoodRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setFood: async (editorID: string, mapEditorFoodRequest: MapEditorFoodRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'editorID' is not null or undefined
+            assertParamExists('setFood', 'editorID', editorID)
+            // verify required parameter 'mapEditorFoodRequest' is not null or undefined
+            assertParamExists('setFood', 'mapEditorFoodRequest', mapEditorFoodRequest)
+            const localVarPath = `/editor/setFood`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (editorID !== undefined) {
+                localVarQueryParameter['editorID'] = editorID;
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(mapEditorFoodRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} editorID 
+         * @param {FrogDTO} frogDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setFrog: async (editorID: string, frogDTO: FrogDTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'editorID' is not null or undefined
+            assertParamExists('setFrog', 'editorID', editorID)
+            // verify required parameter 'frogDTO' is not null or undefined
+            assertParamExists('setFrog', 'frogDTO', frogDTO)
+            const localVarPath = `/editor/setFrog`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (editorID !== undefined) {
+                localVarQueryParameter['editorID'] = editorID;
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(frogDTO, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} editorID 
+         * @param {string} map 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setMap: async (editorID: string, map: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'editorID' is not null or undefined
+            assertParamExists('setMap', 'editorID', editorID)
+            // verify required parameter 'map' is not null or undefined
+            assertParamExists('setMap', 'map', map)
+            const localVarPath = `/editor/setMap`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (editorID !== undefined) {
+                localVarQueryParameter['editorID'] = editorID;
+            }
+
+            if (map !== undefined) {
+                localVarQueryParameter['map'] = map;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -591,6 +788,57 @@ export const MapEditorControllerApiFp = function(configuration?: Configuration) 
             const operationBasePath = operationServerMap['MapEditorControllerApi.draw']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
+        /**
+         * 
+         * @param {string} editorID 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async loadMap(editorID: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MapEditorResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.loadMap(editorID, options);
+            const index = configuration?.serverIndex ?? 0;
+            const operationBasePath = operationServerMap['MapEditorControllerApi.loadMap']?.[index]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} editorID 
+         * @param {MapEditorFoodRequest} mapEditorFoodRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async setFood(editorID: string, mapEditorFoodRequest: MapEditorFoodRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MapEditorResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.setFood(editorID, mapEditorFoodRequest, options);
+            const index = configuration?.serverIndex ?? 0;
+            const operationBasePath = operationServerMap['MapEditorControllerApi.setFood']?.[index]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} editorID 
+         * @param {FrogDTO} frogDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async setFrog(editorID: string, frogDTO: FrogDTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MapEditorResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.setFrog(editorID, frogDTO, options);
+            const index = configuration?.serverIndex ?? 0;
+            const operationBasePath = operationServerMap['MapEditorControllerApi.setFrog']?.[index]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} editorID 
+         * @param {string} map 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async setMap(editorID: string, map: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MapEditorResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.setMap(editorID, map, options);
+            const index = configuration?.serverIndex ?? 0;
+            const operationBasePath = operationServerMap['MapEditorControllerApi.setMap']?.[index]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+        },
     }
 };
 
@@ -620,6 +868,45 @@ export const MapEditorControllerApiFactory = function (configuration?: Configura
          */
         draw(editorID: string, mapEditorDrawRequest: Array<MapEditorDrawRequest>, options?: any): AxiosPromise<MapEditorResponse> {
             return localVarFp.draw(editorID, mapEditorDrawRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} editorID 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        loadMap(editorID: string, options?: any): AxiosPromise<MapEditorResponse> {
+            return localVarFp.loadMap(editorID, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} editorID 
+         * @param {MapEditorFoodRequest} mapEditorFoodRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setFood(editorID: string, mapEditorFoodRequest: MapEditorFoodRequest, options?: any): AxiosPromise<MapEditorResponse> {
+            return localVarFp.setFood(editorID, mapEditorFoodRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} editorID 
+         * @param {FrogDTO} frogDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setFrog(editorID: string, frogDTO: FrogDTO, options?: any): AxiosPromise<MapEditorResponse> {
+            return localVarFp.setFrog(editorID, frogDTO, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} editorID 
+         * @param {string} map 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setMap(editorID: string, map: string, options?: any): AxiosPromise<MapEditorResponse> {
+            return localVarFp.setMap(editorID, map, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -653,6 +940,53 @@ export class MapEditorControllerApi extends BaseAPI {
      */
     public draw(editorID: string, mapEditorDrawRequest: Array<MapEditorDrawRequest>, options?: RawAxiosRequestConfig) {
         return MapEditorControllerApiFp(this.configuration).draw(editorID, mapEditorDrawRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} editorID 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MapEditorControllerApi
+     */
+    public loadMap(editorID: string, options?: RawAxiosRequestConfig) {
+        return MapEditorControllerApiFp(this.configuration).loadMap(editorID, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} editorID 
+     * @param {MapEditorFoodRequest} mapEditorFoodRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MapEditorControllerApi
+     */
+    public setFood(editorID: string, mapEditorFoodRequest: MapEditorFoodRequest, options?: RawAxiosRequestConfig) {
+        return MapEditorControllerApiFp(this.configuration).setFood(editorID, mapEditorFoodRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} editorID 
+     * @param {FrogDTO} frogDTO 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MapEditorControllerApi
+     */
+    public setFrog(editorID: string, frogDTO: FrogDTO, options?: RawAxiosRequestConfig) {
+        return MapEditorControllerApiFp(this.configuration).setFrog(editorID, frogDTO, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} editorID 
+     * @param {string} map 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MapEditorControllerApi
+     */
+    public setMap(editorID: string, map: string, options?: RawAxiosRequestConfig) {
+        return MapEditorControllerApiFp(this.configuration).setMap(editorID, map, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
