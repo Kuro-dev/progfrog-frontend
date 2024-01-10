@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {useEditorStore} from "@/stores/EditorStore";
 import {useEditorApi} from "@/composables/EditorHelper";
-import {Direction, TileType} from "@/api/generated";
+import {TileType} from "@/api/generated";
 import {computed, ref} from "vue";
 import {useAssetStore} from "@/stores/AssetStore";
 import {onKeyStroke} from "@vueuse/core";
@@ -16,21 +16,28 @@ const props = defineProps<{
 
 if (props.hotkey) {
   console.log("registering hotkey:", props.hotkey, "for food placement/removal")
-  onKeyStroke(props.hotkey, (e) => {
+  onKeyStroke(props.hotkey, () => {
     selectAsset()
   })
 }
 
-const asset = computed(() => assets.getEntity(editor.frog?.direction ?? Direction.North))
+const asset = computed(() => assets.getFood())
 
 const amount = ref(1)
 
 function clickListener() {
   if (lowerBounds(amount.value) !== true) {
-    amount.value = 1
+    amount.value = 0
   }
   if (upperBounds(amount.value) !== true) {
     amount.value = 1
+  }
+  const maybeExistingItem = editor.foodPositions
+      .filter(value => value.pos.y === editor.selectedTile.y &&
+          value.pos.x === editor.selectedTile.x &&
+          value.amount === amount.value).pop()
+  if (maybeExistingItem) {
+    return
   }
   editorApi.setFood({
     position: editor.selectedTile,
@@ -44,12 +51,14 @@ function selectAsset() {
 }
 
 function lowerBounds(val: number) {
-  return val > 0 || 'Value must be greater than 0'
+  return val > -1 || 'Value must be positive'
 }
 
 function upperBounds(val: number) {
   return val < 100 || 'Value must be smaller than 100'
 }
+
+
 </script>
 
 <template>

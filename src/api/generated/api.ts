@@ -91,13 +91,13 @@ export interface Coordinate {
      * @type {number}
      * @memberof Coordinate
      */
-    'x'?: number;
+    'x': number;
     /**
      * 
      * @type {number}
      * @memberof Coordinate
      */
-    'y'?: number;
+    'y': number;
 }
 /**
  * 
@@ -115,6 +115,25 @@ export const Direction = {
 export type Direction = typeof Direction[keyof typeof Direction];
 
 
+/**
+ * 
+ * @export
+ * @interface FoodItemDTO
+ */
+export interface FoodItemDTO {
+    /**
+     * 
+     * @type {Coordinate}
+     * @memberof FoodItemDTO
+     */
+    'pos': Coordinate;
+    /**
+     * 
+     * @type {number}
+     * @memberof FoodItemDTO
+     */
+    'amount': number;
+}
 /**
  * 
  * @export
@@ -202,10 +221,10 @@ export interface MapEditorResponse {
     'frog'?: FrogDTO;
     /**
      * 
-     * @type {{ [key: string]: number; }}
+     * @type {Array<FoodItemDTO>}
      * @memberof MapEditorResponse
      */
-    'foodItems': { [key: string]: number; };
+    'foodItems': Array<FoodItemDTO>;
 }
 /**
  * 

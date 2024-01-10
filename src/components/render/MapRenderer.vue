@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import {computed, onMounted, reactive, ref, watch} from 'vue';
-import {type Coordinate, type FrogDTO} from "@/api/generated";
+import {type Coordinate, type FoodItemDTO, type FrogDTO} from "@/api/generated";
 import {getTileType} from "@/composables/EditorHelper";
 import {computedEager, useMouseInElement} from "@vueuse/core";
 import {useAssetStore} from "@/stores/AssetStore";
+import FoodItemComponent from "@/components/render/FoodItemComponent.vue";
 
 interface MapDrawerProps {
   mapString: string;
@@ -11,6 +12,7 @@ interface MapDrawerProps {
   showHoverTile?: boolean
   selectedTile?: Coordinate,
   frog?: FrogDTO,
+  foodTiles?: FoodItemDTO[]
 }
 
 const emit = defineEmits<{
@@ -19,7 +21,9 @@ const emit = defineEmits<{
   (e: "contextmenu", val: MouseEvent): void
 }>()
 const assets = useAssetStore();
-const props = defineProps<MapDrawerProps>();
+const props = withDefaults(defineProps<MapDrawerProps>(), {
+  foodTiles: () => [] as FoodItemDTO[]
+});
 
 
 const canvas = ref<HTMLCanvasElement | null>(null);
@@ -110,10 +114,11 @@ function handleContextMenuEvent(event: MouseEvent) {
 const imagePosition: Coordinate = reactive({x: 0, y: 0})
 
 function drawFrog(tileSizeX: number = computeTileSizeX(), tileSizeY: number = computeTileSizeY()) {
-  if (props.frog && canvas.value) {
+  const frog = props.frog;
+  if (frog && canvas.value) {
     const left = canvas.value.offsetLeft
-    imagePosition.x = Math.floor(left + (props.frog.position.x * tileSizeX))
-    imagePosition.y = Math.floor((props.frog.position.y * tileSizeY))
+    imagePosition.x = Math.floor(left + (frog.position.x * tileSizeX))
+    imagePosition.y = Math.floor((frog.position.y * tileSizeY))
   }
 }
 
@@ -123,6 +128,8 @@ const frogTexture = computed(() => {
   }
   return undefined
 })
+
+const offsetLeft = computed(() => canvas.value?.offsetLeft ?? 0)
 </script>
 <template>
   <div>
@@ -139,11 +146,18 @@ const frogTexture = computed(() => {
             :height="height"
             :width="width"
             class="position-absolute"/>
+    <!--Frog view-->
     <v-img v-show="frog" ref="frogView" :height="computeTileSizeY()" :src="frogTexture"
            :style="{ top: `${imagePosition.y}px`, left: `${imagePosition.x}px` }"
            :width="computeTileSizeX()"
            alt="frog-gif" class="position-absolute no-mouse-interaction"/>
 
+    <FoodItemComponent v-for="food in foodTiles" :key="food.pos.x +'x'+food.pos.y"
+                       :amount="food.amount"
+                       :offset-left="offsetLeft"
+                       :position="food.pos"
+                       :tile-size-x="computeTileSizeX"
+                       :tile-size-y="computeTileSizeY"/>
     <div v-if="showDebugInfo" class="bottomRight">
       <div>Tile: {{ hoveredTile.x }} x {{ hoveredTile.y }}</div>
       <div>Frog: {{ imagePosition }}</div>

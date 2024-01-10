@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 
-import MapRenderer from "@/components/MapRenderer.vue";
+import MapRenderer from "@/components/render/MapRenderer.vue";
 import {ref} from "vue";
 
 

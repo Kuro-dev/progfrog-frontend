@@ -57,9 +57,11 @@ export function useEditorApi() {
     const loading = toRef(store, "loading")
 
     async function setState(state: MapEditorResponse) {
+        // console.log(JSON.stringify(state, null, 2))
         mapData.value = state.map
         store.frog = state.frog
         mapId.value = state.mapID
+        store.foodPositions = state.foodItems
         await router.replace({query: undefined})
         await router.push({query: {id: mapId.value}})
 
@@ -96,8 +98,8 @@ export function useEditorApi() {
         return new Promise((resolve, reject) => {
             if (mapId.value) {
                 api.draw(mapId.value, req)
-                    .then(value => {
-                        mapData.value = value.data.map
+                    .then(async value => {
+                        await setState(value.data)
                         resolve(mapData.value)
                     })
                     .finally(() => loading.value = false)

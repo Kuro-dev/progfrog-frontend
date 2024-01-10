@@ -251,16 +251,17 @@ components:
         rowDelimiter:
           type: string
     Coordinate:
+      required:
+      - x
+      - "y"
       type: object
       properties:
         x:
           type: integer
           format: int32
-          writeOnly: true
         "y":
           type: integer
           format: int32
-          writeOnly: true
     Direction:
       type: string
       enum:
@@ -268,6 +269,17 @@ components:
       - SOUTH
       - WEST
       - EAST
+    FoodItemDTO:
+      required:
+      - amount
+      - pos
+      type: object
+      properties:
+        pos:
+          $ref: '#/components/schemas/Coordinate'
+        amount:
+          type: integer
+          format: int32
     FrogDTO:
       required:
       - direction
@@ -292,10 +304,9 @@ components:
         frog:
           $ref: '#/components/schemas/FrogDTO'
         foodItems:
-          type: object
-          additionalProperties:
-            type: integer
-            format: int32
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodItemDTO'
     MapEditorFoodRequest:
       type: object
       properties:

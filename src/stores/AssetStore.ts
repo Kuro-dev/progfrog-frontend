@@ -68,10 +68,33 @@ export const useAssetStore = defineStore('game-store', () => {
         return promise;
     }
 
+    const cookiePath = "/assets/game/entity/cookie.png"
+    function getFood(){
+        return cookiePath
+    }
+
+    function getFoodImage() {
+        if (images[cookiePath]) {
+            return Promise.resolve(images[cookiePath])
+        }
+        const img = new Image()
+        const promise = new Promise<HTMLImageElement>((resolve, reject) => {
+            img.onload = () => {
+                resolve(img)
+            }
+            img.onerror = reject;
+        })
+        img.src = cookiePath
+        images[cookiePath] = img;
+        return promise;
+    }
+
     return {
         getAsset,
         getAssetImage,
         getEntity,
-        getEntityImage
+        getEntityImage,
+        getFood,
+        getFoodImage,
     }
 })

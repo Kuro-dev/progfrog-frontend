@@ -21,7 +21,7 @@ if (props.hotkey) {
   })
 }
 
-const asset = computed(() => assets.getEntity(editor.frog?.direction ?? Direction.North))
+const asset = computed(() => assets.getEntity(editor.frog?.direction ?? Direction.South))
 
 function rotateDirection(dir: Direction): Direction {
   switch (dir) {
@@ -37,11 +37,11 @@ function rotateDirection(dir: Direction): Direction {
 }
 
 function clickListener() {
-  if (editor.frog?.position.x === editor.selectedTile.x && editor.frog.position.y === editor.selectedTile.y) {
+  if (editor.frog && editor.frog?.position.x === editor.selectedTile.x && editor.frog.position.y === editor.selectedTile.y) {
     editor.frog.direction = rotateDirection(editor.frog.direction)
   }
   editorApi.setFrog({
-    direction: editor.frog?.direction ?? Direction.North,
+    direction: editor.frog?.direction ?? Direction.South,
     position: editor.selectedTile
   })
 }
@@ -54,7 +54,7 @@ function selectAsset() {
 
 <template>
   <v-col>
-    <v-img :class="{'selected':editor.selectedType === TileType.None}" :src="asset" class="clickable"
+    <v-img :class="{'selected':editor.onEditorClick === clickListener}" :src="asset" class="clickable"
            @click="selectAsset">
       <v-tooltip activator="parent">
         {{ props.hotkey }}

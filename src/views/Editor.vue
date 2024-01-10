@@ -1,14 +1,13 @@
 <script lang="ts" setup>
 
 import {useEditorApi} from "@/composables/EditorHelper";
-import MapRenderer from "@/components/MapRenderer.vue";
+import MapRenderer from "@/components/render/MapRenderer.vue";
 import {reactive, ref, toValue} from "vue";
 import MapEditor from "@/components/editor/MapEditor.vue";
 import {useEditorStore} from "@/stores/EditorStore";
 import {type Coordinate, TileType} from "@/api/generated";
 import {useAssetStore} from "@/stores/AssetStore";
 import MapSelectionMenuItem from "@/components/contextmenu/MapSelectionMenuItem.vue";
-import FrogSelectionmenuItem from "@/components/contextmenu/FrogSelectionmenuItem.vue";
 
 const editor = useEditorApi()
 
@@ -87,7 +86,7 @@ function showCustomContextMenu(event: MouseEvent) {
         </v-col>
         <v-col>
           <MapRenderer v-if="mapData" v-model:selected-tile="store.selectedTile" :frog="store.frog"
-                       :map-string="mapData" show-debug-info
+                       :map-string="mapData" show-debug-info :food-tiles="store.foodPositions"
                        show-hover-tile @click="tryEditorInteraction" @contextmenu="showCustomContextMenu"/>
         </v-col>
       </v-row>
@@ -100,7 +99,6 @@ function showCustomContextMenu(event: MouseEvent) {
           <MapSelectionMenuItem :type="TileType.Floor"/>
           <MapSelectionMenuItem :type="TileType.Wall"/>
           <MapSelectionMenuItem :type="TileType.Void"/>
-          <FrogSelectionmenuItem/>
         </v-list>
       </v-menu>
     </v-responsive>

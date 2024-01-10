@@ -1,12 +1,7 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
-import {type Coordinate, type FrogDTO, TileType} from "@/api/generated";
-import {useUrlSearchParams} from "@vueuse/core";
+import {type Coordinate, type FoodItemDTO, type FrogDTO, TileType} from "@/api/generated";
 
-export interface FoodPosition {
-    pos: Coordinate
-    amount: number
-}
 
 export const useEditorStore = defineStore('editorStore', () => {
 
@@ -19,7 +14,7 @@ export const useEditorStore = defineStore('editorStore', () => {
     const selectedType = ref<TileType>(TileType.Wall)
 
     const frog = ref<FrogDTO>()
-    const foodPositions = ref<FoodPosition[]>([])
+    const foodPositions = ref<FoodItemDTO[]>([])
 
     const onEditorClick = ref<Function>()
     return {
