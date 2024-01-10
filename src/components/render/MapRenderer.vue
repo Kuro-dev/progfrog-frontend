@@ -146,11 +146,7 @@ const offsetLeft = computed(() => canvas.value?.offsetLeft ?? 0)
             :height="height"
             :width="width"
             class="position-absolute"/>
-    <!--Frog view-->
-    <v-img v-show="frog" ref="frogView" :height="computeTileSizeY()" :src="frogTexture"
-           :style="{ top: `${imagePosition.y}px`, left: `${imagePosition.x}px` }"
-           :width="computeTileSizeX()"
-           alt="frog-gif" class="position-absolute no-mouse-interaction"/>
+
 
     <FoodItemComponent v-for="food in foodTiles" :key="food.pos.x +'x'+food.pos.y"
                        :amount="food.amount"
@@ -158,6 +154,11 @@ const offsetLeft = computed(() => canvas.value?.offsetLeft ?? 0)
                        :position="food.pos"
                        :tile-size-x="computeTileSizeX"
                        :tile-size-y="computeTileSizeY"/>
+    <!--Frog view-->
+    <v-img v-show="frog" ref="frogView" :height="computeTileSizeY()" :src="frogTexture"
+           :style="{ top: `${imagePosition.y}px`, left: `${imagePosition.x}px` }"
+           :width="computeTileSizeX()"
+           alt="frog-gif" class="position-absolute no-mouse-interaction"/>
     <div v-if="showDebugInfo" class="bottomRight">
       <div>Tile: {{ hoveredTile.x }} x {{ hoveredTile.y }}</div>
       <div>Frog: {{ imagePosition }}</div>

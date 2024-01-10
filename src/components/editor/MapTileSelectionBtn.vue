@@ -31,7 +31,7 @@ function selectAsset() {
   <v-col>
     <v-img :class="{'selected':store.selectedType === type}" :src="asset" class="clickable"
            @click="selectAsset">
-      <v-tooltip activator="parent">
+      <v-tooltip v-if="hotkey" activator="parent">
         {{ props.hotkey }}
       </v-tooltip>
     </v-img>

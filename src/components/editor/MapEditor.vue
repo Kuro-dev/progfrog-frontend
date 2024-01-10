@@ -11,11 +11,11 @@ import FoodPlacementButton from "@/components/editor/FoodPlacementButton.vue";
     <v-card-title>Editor Options</v-card-title>
     <v-card-text>
       <v-row>
-        <MapTileSelectionBtn :type="TileType.Wall" hotkey="1"/>
-        <MapTileSelectionBtn :type="TileType.Floor" hotkey="2"/>
-        <MapTileSelectionBtn :type="TileType.Void" hotkey="3"/>
-        <FrogPlacementButton hotkey="4"/>
-        <FoodPlacementButton hotkey="5"/>
+        <MapTileSelectionBtn :type="TileType.Wall"/>
+        <MapTileSelectionBtn :type="TileType.Floor"/>
+        <MapTileSelectionBtn :type="TileType.Void"/>
+        <FrogPlacementButton/>
+        <FoodPlacementButton/>
       </v-row>
     </v-card-text>
   </v-card>
