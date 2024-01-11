@@ -2,6 +2,8 @@
 
 import MapRenderer from "@/components/render/MapRenderer.vue";
 import {ref} from "vue";
+import {useEditorStore} from "@/stores/EditorStore";
+const editorStore = useEditorStore()
 
 
 const mapString = ref(`
@@ -19,6 +21,7 @@ XXXXXXX
 
 <template>
   <v-container>
+    <v-btn v-if="editorStore.mapID" @click="loadMap">Load map from editor</v-btn>
     <v-row>
       <v-col>
         <v-textarea label="Editor"/>
